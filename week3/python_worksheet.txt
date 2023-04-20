@@ -1,0 +1,52 @@
+# The Snowpark package is required for Python Worksheets.
+# You can add more packages by selecting them using the Packages control and then importing them.
+
+import snowflake.snowpark as snowpark
+from snowflake.snowpark.functions import col
+
+def simple_table_select(session, tableName):
+    dataframe = session.table(tableName)
+
+    return dataframe
+
+def table_with_simple_filter(session, tableName, filter_value):
+    dataframe = session.table(tableName).filter(col('table_owner') == filter_value)
+
+    return dataframe
+
+def main(session: snowpark.Session):
+
+    #simple example of querying the table through custom function
+    df = simple_table_select(session, 'information_schema.tables')
+
+    #another simple example to use a filter
+    df2 = table_with_simple_filter(session, 'information_schema.tables', 'SYSADMIN')
+
+
+    #you can use charts to vizualize the output same like you would do for SQL
+    wh_meetering_df = session.table('SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY')
+
+    wh_meetering_df.show()
+
+    #this python worksheets have issues with printing out the special characters
+
+    #df3 = session.createDataFrame(['Duplіcate']) # not working
+    #df3.show()
+
+    #this works
+    #df3 = session.createDataFrame(['Duplicate']) # working
+    #df3.show()
+
+    # Print a sample of the dataframe to standard output.
+    #df1.show()
+    #df2.show()
+
+    #our gpt_tweets table is full of special characters
+    #df4 = session.table('gpt_tweets')
+    #df4.show()
+
+    df5 = session.table('gpt_tweets').select('username', 'date', 'processed_tweet')
+    df5.show()
+
+    # Return value will appear in the Results tab.
+    return df5
