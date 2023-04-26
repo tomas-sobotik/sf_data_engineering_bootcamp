@@ -1,0 +1,38 @@
+name: sf_deploy
+
+on: 
+  #allow also manual start of WF 
+  workflow_dispatch:
+  push:
+     
+jobs:
+  deploy-Snowflake-changes:
+    runs-on: ubuntu-latest
+    #setting up needed variables
+    env: 
+        SNOWFLAKE_ACCOUNT: ${{  secrets.SNOWFLAKE_ACCOUNT }}
+        SNOWFLAKE_USER: ${{  secrets.SNOWFLAKE_USER }}
+        SNOWFLAKE_ROLE: ${{  secrets.SNOWFLAKE_ROLE }}
+        SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+        SNOWFLAKE_WH: ${{  secrets.SNOWFLAKE_WH }}
+        SNOWFLAKE_DB: ${{  secrets.SNOWFLAKE_DB }}
+       
+        #variables for change scripts in JSON format : {"target_db":"DB_NAME"}
+        SCHEMACHANGE_VAR: ${{ secrets.SCHEMACHANGE_VAR }}
+                          
+    steps:
+      - name: Setup Python 3.8.x
+        uses: actions/setup-python@v2.2.1
+        with:
+         python-version:  3.8.x
+      
+      - name: Repo checkout
+        uses: actions/checkout@v2
+
+      - name: run schemachange!
+        if: ${{ success() }}
+        run: |
+           pip install schemachange
+           schemachange -f ${GITHUB_WORKSPACE}/db_objects -a $SNOWFLAKE_ACCOUNT -u $SNOWFLAKE_USER -r $SNOWFLAKE_ROLE -w $SNOWFLAKE_WH -c $SNOWFLAKE_DB.PUBLIC.CHANGE_HISTORY --var $SCHEMACHANGE_VAR 
+           
+         
