@@ -11,16 +11,16 @@ from snowflake.snowpark.types import IntegerType
 from snowflake.snowpark import Session
 
 connection_parameters = {
-    "account": "BV72174.eu-west-1",
-    "user": "sobottom",
-    "password": "TC*h9*fNa!aexxQ",
+    "account": "<your account>",
+    "user": "<your username>",
+    "password": "<your password>",
    "role": "SYSADMIN",  # optional
    "warehouse": "COMPUTE_WH",  # optional
     "database": "DATA_ENGINEERING",  # optional
     "schema": "PUBLIC",  # optional
-} 
+}
 
-snowpark_session = Session.builder.configs(connection_parameters).create() 
+snowpark_session = Session.builder.configs(connection_parameters).create()
 
 snowpark_session.udf.register(
     func = double
@@ -32,5 +32,5 @@ snowpark_session.udf.register(
   , stage_location = '@UDF_STAGE'
 )
 
-#Step 4: Test the UDF by calling 
+#Step 4: Test the UDF by calling
 snowpark_session.sql('SELECT SNOWPARK_DOUBLE(2)').show()
